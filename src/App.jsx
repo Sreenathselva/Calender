@@ -1,11 +1,14 @@
-import CalendarApp from "./components/CalendarApp"
-import './components/calendarApp.css'
+import CalendarApp from "./components/CalendarApp";
+import "./components/CalendarApp.css";
+
 
 
 const App = () => {
   return (
+    <div className="container">
     <CalendarApp/>
-  )
-}
+    </div>
+  );
+};
 
-export default App
+export default App;
