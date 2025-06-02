@@ -115,6 +115,7 @@
 
 .event-popup{
     position: absolute;
+    display: flex;
     top: 38%;
     left: 3rem;
     background-color: #161b22;
@@ -122,7 +123,6 @@
     aspect-ratio: 10 / 9 ;
     border-radius: 1rem;
     box-shadow: 0 1rem 3rem #00000033;
-    display: none;
     flex-direction: column;
     justify-content: center;
     align-items: center;
