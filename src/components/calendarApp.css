@@ -67,6 +67,15 @@
     font-family: 'poppins';
 }
 
+.event-buttons{
+    display: flex;
+    flex-direction: column;
+}
+
+.edit-icon{
+    font-size: 1.6rem;
+}
+
 .weekdays{
     width: 100%;
     display: flex;

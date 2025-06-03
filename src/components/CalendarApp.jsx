@@ -1,5 +1,6 @@
 import { useState } from "react";
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPenToSquare } from '@fortawesome/free-solid-svg-icons';
 
 const CalendarApp = () => {
 
@@ -104,7 +105,7 @@ const CalendarApp = () => {
   return (
     <div className="calendar-app">
       <div className="calendar">
-        <h1 className="heading">Calendar</h1>
+        <h1 className="heading">Traicon Calendar</h1>
         <div className="navigate-date">
           <h2 className="month">{monthOfYear[currentMonth]}</h2>
           <h2 className="year">{currentYear}</h2>
@@ -168,7 +169,8 @@ const CalendarApp = () => {
           </div>
           <div className="event-text">{event.text}</div>
           <div className="event-buttons">
-
+            <FontAwesomeIcon className="edit-icon" icon={faPenToSquare} />
+            
           </div>
         </div>
         ))}
