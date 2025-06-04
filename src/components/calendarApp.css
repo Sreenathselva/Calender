@@ -11,6 +11,7 @@
     position: relative;
     transform-style: preserve-3d;
 }
+
 .calendar-app::after{
     content: '';
     position: absolute;
@@ -21,8 +22,9 @@
     height: 16rem;
     background-color: #00000085;
     border-radius: 20rem;
-    filter: blur(4px);
+    filter: blur(30px);
 }
+
 .calendar{
     width: 40%;
 }
@@ -68,8 +70,12 @@
 }
 
 .event-buttons{
+    position: absolute;
+    top: 0;
     display: flex;
     flex-direction: column;
+    width: 2rem;
+    height: 100%;
 }
 
 .edit-icon{
@@ -278,14 +284,16 @@
 
 .event-buttons{
     position: absolute;
-    top: 50%;
-    transform: translateY(50%);
+    top: 1rem;
     right: 1rem;
     display: flex;
     flex-direction: column;
-    row-gap: 1rem;
+    width: 2rem;
+    height: auto;
+    gap: 1rem;
 }
 
 .event-buttons i{
     font-size: 1.6rem;
+    fill: #000000;
 }
