@@ -114,6 +114,12 @@
     color: #ddd;
     cursor: pointer;
     text-shadow: 0.4rem 0.6rem #00000033;
+    transition: all ease .1s;
+}
+
+.days span:hover{
+    background-color: #cdcdcd25;
+    border-radius: 50%;
 }
 
 .current-day{
@@ -122,10 +128,53 @@
     box-shadow: 0 0.5rem 1rem rgba(239, 144, 17, .3);
 }
 
+/* Event colors in calendar */
+
+.day-holiday {
+  background-color: rgba(255, 0, 0, 0.327);
+  border-radius: 50%;
+}
+
+.day-holiday:hover{
+    background-color: red !important;
+}
+
+.day-event {
+  background-color: rgba(0, 0, 255, 0.2);
+  border-radius: 50%;
+}
+
+.day-birthday {
+  background-color: rgb(255, 85, 0);
+  border-radius: 50%;
+}
+
+/* Event card styles */
+.event.holiday {
+  background-color: red;
+  color: white;
+}
+
+.event.event-speacial {
+  background-color: blue;
+  color: white;
+}
+
+.event.birthday {
+  background-color: rgb(255, 85, 0);
+  color: black;
+}
+
+
 .events{
     width: 60%;
     height: 100%;
     padding: 3rem 0;
+    overflow-y: scroll;
+}
+
+.events::-webkit-scrollbar {
+  display: none;
 }
 
 .event-popup{

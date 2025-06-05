@@ -23,7 +23,7 @@ const CalendarApp = () => {
   ];
 
   const currentDate = new Date()
-
+// const [currentMonth, setCurrentMonth] = useState(currentDate.getMonth());
   const [currentMonth, setCurrentMonth] = useState(currentDate.getMonth());
   const [currentYear, setCurrentYear] = useState(currentDate.getFullYear());
   const [selectedDate, setSelectedDate] = useState(currentDate);
@@ -32,6 +32,7 @@ const CalendarApp = () => {
   const [eventTime, setEventTime] = useState({ hours: '00', minutes: '00' })
   const [eventText, setEventText] = useState('')
   const [editingEvent, setEditingEvent] = useState(null);
+  const [eventType, setEventType] = useState("holiday");
 
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
   const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
@@ -73,6 +74,7 @@ const CalendarApp = () => {
       date: new Date(selectedDate),
       time: `${eventTime.hours.padStart(2, '0')}:${eventTime.minutes.padStart(2, '0')}`,
       text: eventText,
+      type: eventType,
     }
 
     let updatedEvents = [...events]
@@ -90,6 +92,7 @@ const CalendarApp = () => {
     setEvents(updatedEvents)
     setEventTime({ hours: '00', minutes: '00' })
     setEventText("")
+    setEventType("holiday");
     setShowEventPopup(false)
     setEditingEvent(null);
   }
@@ -136,15 +139,31 @@ const CalendarApp = () => {
           {[...Array(firstDayOfMonth).keys()].map((_, index) => (
             <span key={`empty-${index}`} />
           ))}
-          {[...Array(daysInMonth).keys()].map((day) =>
-            <span key={day + 1} className={
-              day + 1 === currentDate.getDate()
+          {[...Array(daysInMonth).keys()].map((day) => {
+            const thisDate = new Date(currentYear, currentMonth, day + 1);
+
+            // Check if there’s an event on this date
+            const eventOnThisDate = events.find(
+              (event) =>
+                new Date(event.date).getFullYear() === thisDate.getFullYear() &&
+                new Date(event.date).getMonth() === thisDate.getMonth() &&
+                new Date(event.date).getDate() === thisDate.getDate()
+            );
+          
+            const dateClass = `
+              ${day + 1 === currentDate.getDate()
                 && currentMonth === currentDate.getMonth()
                 && currentYear === currentDate.getFullYear()
                 ? 'current-day' : ''}
-              onClick={() => handleDayClick(day + 1)}
-            >{day + 1}</span>
-          )}
+              ${eventOnThisDate ? `day-${eventOnThisDate.type}` : ''}
+            `;
+              
+            return (
+              <span key={day + 1} className={dateClass.trim()} onClick={() => handleDayClick(day + 1)}>
+                {day + 1}
+              </span>
+            );
+          })}
         </div>
       </div>
       <div className="events">
@@ -154,21 +173,38 @@ const CalendarApp = () => {
               <div className="event-popup-time">Time</div>
               <input type="number" name="hours" min={0} max={24} className="hours"
                 value={eventTime.hours}
-                onChange={(e) =>
-                  setEventTime({ ...eventTime, hours: e.target.value })
-                } />
+                onChange={(e) =>{
+                  let value = parseInt(e.target.value);
+                  if (value > 24) value = 24;
+                  if(value < 0 || isNaN(value)) value = 0;
+                  setEventTime({ ...eventTime, hours: String(value).padStart(2, '0')})
+                }} />
               <input type="number" name="minutes" min={0} max={60} className="minutes"
                 value={eventTime.minutes}
-                onChange={(e) =>
-                  setEventTime({ ...eventTime, minutes: e.target.value })
+                onChange={(e) => {
+                    let value = parseInt(e.target.value);
+                    if (value > 60) value = 60;
+                    if (value < 0 || isNaN(value)) value = 0;
+                    setEventTime({ ...eventTime, minutes: String(value).padStart(2, '0') });
+                  }
                 } />
             </div>
+            <select
+              value={eventType}
+              onChange={(e) => setEventType(e.target.value)}
+              className="event-type-select"
+            >
+              <option value="holiday">Holiday</option>
+              <option value="event">Event</option>
+              <option value="birthday">Birthday</option>
+            </select>
             <textarea placeholder="Enter Event Text (Maximum 60 Characters)"
               value={eventText} onChange={(e) => {
                 if (e.target.value.length <= 60) {
                   setEventText(e.target.value)
                 }
               }}
+
               name="" id=""></textarea>
             <button className="event-popup-btn" onClick={handleEventSubmit}>
             {editingEvent ? 'Update Event' : "Add Event"}
@@ -178,7 +214,7 @@ const CalendarApp = () => {
             </button>
           </div>}
         {events.map((event, index) => (
-          <div className="event" key={index}>
+          <div className={`event ${event.type}`} key={index}>
             <div className="event-date-wrapper">
               <div className="event-date">
                {(() => {
