@@ -23,7 +23,7 @@ const CalendarApp = () => {
   ];
 
   const currentDate = new Date()
-// const [currentMonth, setCurrentMonth] = useState(currentDate.getMonth());
+
   const [currentMonth, setCurrentMonth] = useState(currentDate.getMonth());
   const [currentYear, setCurrentYear] = useState(currentDate.getFullYear());
   const [selectedDate, setSelectedDate] = useState(currentDate);
@@ -192,8 +192,7 @@ const CalendarApp = () => {
             <select
               value={eventType}
               onChange={(e) => setEventType(e.target.value)}
-              className="event-type-select"
-            >
+              className="event-type-select">
               <option value="holiday">Holiday</option>
               <option value="event">Event</option>
               <option value="birthday">Birthday</option>
@@ -204,7 +203,6 @@ const CalendarApp = () => {
                   setEventText(e.target.value)
                 }
               }}
-
               name="" id=""></textarea>
             <button className="event-popup-btn" onClick={handleEventSubmit}>
             {editingEvent ? 'Update Event' : "Add Event"}
@@ -213,7 +211,15 @@ const CalendarApp = () => {
               <span>x</span>
             </button>
           </div>}
-        {events.map((event, index) => (
+        {events
+          .filter((event) => {
+            const dateObj = new Date(event.date);
+            return (
+              dateObj.getFullYear() === currentYear &&
+              dateObj.getMonth() === currentMonth
+            );
+          })
+          .map((event, index) => (
           <div className={`event ${event.type}`} key={index}>
             <div className="event-date-wrapper">
               <div className="event-date">

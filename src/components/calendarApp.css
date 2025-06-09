@@ -129,7 +129,40 @@
 }
 
 /* Event colors in calendar */
+.event-type-select {
+  border: 2px solid #4a90e2;
+  border-radius: 8px;
+  width: 70%;
+  padding: 5px 10px;
+  background-color: #f9f9f900;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 500;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg fill='white' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 20px;
+}
 
+.event-type-select:hover {
+  background-color: #007bff0a;
+  border-color: #00a3ff;
+}
+.event-type-select option{
+    background-color: #1e242d;
+    border-radius: 1vw;
+    border: 0;
+    outline: 0;
+}
+
+.event-type-select:focus {
+  border-color: #0056b3;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2);
+}
 .day-holiday {
   background-color: rgba(255, 0, 0, 0.327);
   border-radius: 50%;
