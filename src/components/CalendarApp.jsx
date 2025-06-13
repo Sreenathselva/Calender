@@ -1,8 +1,14 @@
 import { useState } from "react";
+import axios from "axios";
+import { useEffect } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPenToSquare } from '@fortawesome/free-solid-svg-icons';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 // import ErrorBoundary from './ErrorBoundary';
+
+
+
+
 
 const CalendarApp = () => {
 
@@ -68,34 +74,52 @@ const CalendarApp = () => {
     )
   }
 
-  const handleEventSubmit = () => {
-    const newEvent = {
-      id: editingEvent ? editingEvent.id : Date.now(),
-      date: new Date(selectedDate),
-      time: `${eventTime.hours.padStart(2, '0')}:${eventTime.minutes.padStart(2, '0')}`,
-      text: eventText,
-      type: eventType,
+// Fetch events when month/year changes
+useEffect(() => {
+  const fetchEvents = async () => {
+    try {
+      const res = await axios.get(`http://localhost:5000/events`, {
+        params: {
+          month: currentMonth,
+          year: currentYear
+        }
+      });
+      setEvents(res.data);
+    } catch (err) {
+      console.error("Failed to fetch events", err);
+    }
+  };
+
+  fetchEvents();
+}, [currentMonth, currentYear]);
+
+  const handleEventSubmit = async () => {
+  const newEvent = {
+    date: selectedDate,
+    time: `${eventTime.hours.padStart(2, '0')}:${eventTime.minutes.padStart(2, '0')}`,
+    text: eventText,
+    type: eventType,
+  };
+
+  try {
+    if (editingEvent) {
+      const res = await axios.put(`http://localhost:5000/events/${editingEvent._id}`, newEvent);
+      setEvents(events.map(event => event._id === res.data._id ? res.data : event));
+    } else {
+      const res = await axios.post("http://localhost:5000/events", newEvent);
+      setEvents([...events, res.data]);
     }
 
-    let updatedEvents = [...events]
-
- if (editingEvent) {
-  updatedEvents = updatedEvents.map((event) => 
-    event.id === editingEvent.id ? newEvent : event
-  );
-} else {
-  updatedEvents.push(newEvent);
-}
-
-    updatedEvents.sort((a, b) => new Date(a.date - new Date(b.date)))
-
-    setEvents(updatedEvents)
-    setEventTime({ hours: '00', minutes: '00' })
-    setEventText("")
-    setEventType("holiday");
-    setShowEventPopup(false)
+    setShowEventPopup(false);
     setEditingEvent(null);
+    setEventText("");
+    setEventTime({ hours: "00", minutes: "00" });
+    setEventType("holiday");
+  } catch (err) {
+    console.error("Error saving event:", err);
   }
+};
+
 
   const handleEditEvent = (event) => {
     if (!event || !event.time || !event.date) {
@@ -113,11 +137,14 @@ const CalendarApp = () => {
     setShowEventPopup(true);
   };
 
-  const handleDeleteEvent = (eventId) => {
-    const updatedEvents = events.filter((deleteEvent) => deleteEvent.id !== eventId)
-
-    setEvents(updatedEvents);
+const handleDeleteEvent = async (eventId) => {
+  try {
+    await axios.delete(`http://localhost:5000/events/${eventId}`);
+    setEvents(events.filter((event) => event._id !== eventId));
+  } catch (err) {
+    console.error("Failed to delete event:", err);
   }
+};
 
 
   return (
@@ -179,11 +206,11 @@ const CalendarApp = () => {
                   if(value < 0 || isNaN(value)) value = 0;
                   setEventTime({ ...eventTime, hours: String(value).padStart(2, '0')})
                 }} />
-              <input type="number" name="minutes" min={0} max={60} className="minutes"
+              <input type="number" name="minutes" min={0} max={50} className="minutes"
                 value={eventTime.minutes}
                 onChange={(e) => {
                     let value = parseInt(e.target.value);
-                    if (value > 60) value = 60;
+                    if (value > 59) value = 59;
                     if (value < 0 || isNaN(value)) value = 0;
                     setEventTime({ ...eventTime, minutes: String(value).padStart(2, '0') });
                   }
@@ -223,22 +250,23 @@ const CalendarApp = () => {
           <div className={`event ${event.type}`} key={index}>
             <div className="event-date-wrapper">
               <div className="event-date">
-               {(() => {
-                      const dateObj = event.date instanceof Date
-                        ? event.date
-                        : new Date(event.date);
-
-                      return !isNaN(dateObj)
-                        ? `${monthOfYear[dateObj.getMonth()]} ${dateObj.getFullYear()}`
-                        : "Invalid Date";
-                    })()}
+                {(() => {
+                  const dateObj = event.date instanceof Date
+                    ? event.date
+                    : new Date(event.date);
+                
+                  return !isNaN(dateObj)
+                    ? `${monthOfYear[dateObj.getMonth()]} ${dateObj.getDate()}, ${dateObj.getFullYear()}`
+                    : "Invalid Date";
+                })()}
               </div>
               <div className="event-time">{event.time}</div>
             </div>
             <div className="event-text">{event.text}</div>
             <div className="event-buttons">
               <FontAwesomeIcon className="edit-icon" onClick={() => handleEditEvent(event)} icon={faPenToSquare} />
-              <FontAwesomeIcon className="edit-icon" icon={faTrash} onClick={() => handleDeleteEvent(event.id)} />
+              <FontAwesomeIcon className="edit-icon" icon={faTrash} key={event._id}
+              onClick={() => handleDeleteEvent(event._id)} />
             </div>
           </div>
         ))}

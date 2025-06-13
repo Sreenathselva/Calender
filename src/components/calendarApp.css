@@ -346,6 +346,7 @@
 .event-date{
     font-size: clamp(1rem, 1cqi, 1.2rem);
     color: #ddd;
+    font-weight: 600;
 }
 
 .event-time{
