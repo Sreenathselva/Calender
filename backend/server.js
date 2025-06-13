@@ -1,6 +1,9 @@
 const express = require("express");
-const mongoose = require("mongoose");
+const mysql = require("mysql2");
 const cors = require("cors");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+
 
 const app = express();
 const PORT = 5000;
@@ -9,54 +12,111 @@ const PORT = 5000;
 app.use(cors());
 app.use(express.json());
 
-// MongoDB connection
-mongoose.connect("mongodb://localhost:27017/calendar", {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-}).then(() => console.log("MongoDB Connected"))
-  .catch(err => console.log("DB Error: ", err));
-
-// Event Schema
-const eventSchema = new mongoose.Schema({
-  date: Date,
-  time: String,
-  text: String,
-  type: String
+// MySQL connection
+const db = mysql.createConnection({
+  host: "localhost",
+  user: "root",        // change if your user is different
+  password: "",        // your MySQL password
+  database: "calendar"
 });
 
-const Event = mongoose.model("Event", eventSchema);
+db.connect((err) => {
+  if (err) {
+    console.log("MySQL Connection Error:", err);
+  } else {
+    console.log("MySQL Connected");
+  }
+});
 
-// Routes
-
-// GET events by month/year
-app.get("/events", async (req, res) => {
+// Get events by month/year
+app.get("/events", (req, res) => {
   const { month, year } = req.query;
-  const events = await Event.find({
-    date: {
-      $gte: new Date(`${year}-${Number(month)+1}-01`),
-      $lt: new Date(`${year}-${Number(month)+2}-01`)
+  const start = `${year}-${Number(month) + 1}-01`;
+  const end = `${year}-${Number(month) + 2}-01`;
+
+  db.query(
+    "SELECT * FROM events WHERE date >= ? AND date < ? ORDER BY date ASC",
+    [start, end],
+    (err, results) => {
+      if (err) return res.status(500).send(err);
+      res.json(results);
     }
-  }).sort({ date: 1 });
-  res.json(events);
+  );
 });
 
-// POST new event
-app.post("/events", async (req, res) => {
-  const newEvent = new Event(req.body);
-  await newEvent.save();
-  res.status(201).json(newEvent);
+// Create new event
+app.post("/events", (req, res) => {
+  const { date, time, text, type } = req.body;
+
+  db.query(
+    "INSERT INTO events (date, time, text, type) VALUES (?, ?, ?, ?)",
+    [date, time, text, type],
+    (err, result) => {
+      if (err) return res.status(500).send(err);
+      res.status(201).json({ id: result.insertId, date, time, text, type });
+    }
+  );
 });
 
-// PUT update event
-app.put("/events/:id", async (req, res) => {
-  const updated = await Event.findByIdAndUpdate(req.params.id, req.body, { new: true });
-  res.json(updated);
+// Update event
+app.put("/events/:id", (req, res) => {
+  const { date, time, text, type } = req.body;
+  const id = req.params.id;
+
+  db.query(
+    "UPDATE events SET date = ?, time = ?, text = ?, type = ? WHERE id = ?",
+    [date, time, text, type, id],
+    (err) => {
+      if (err) return res.status(500).send(err);
+      res.json({ id, date, time, text, type });
+    }
+  );
 });
 
-// DELETE event
-app.delete("/events/:id", async (req, res) => {
-  await Event.findByIdAndDelete(req.params.id);
-  res.status(204).end();
+// Delete event
+app.delete("/events/:id", (req, res) => {
+  const id = req.params.id;
+
+  db.query("DELETE FROM events WHERE id = ?", [id], (err) => {
+    if (err) return res.status(500).send(err);
+    res.status(204).end();
+  });
 });
 
-app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});
+
+
+
+// Register endpoint
+app.post("/register", async (req, res) => {
+  const { username, password, role } = req.body;
+  const hashedPassword = await bcrypt.hash(password, 10);
+  db.query(
+    "INSERT INTO users (username, password, role) VALUES (?, ?, ?)",
+    [username, hashedPassword, role],
+    (err) => {
+      if (err) return res.status(500).send(err);
+      res.status(201).send("User registered");
+    }
+  );
+});
+
+// Login endpoint
+app.post("/login", (req, res) => {
+  const { username, password } = req.body;
+
+  db.query("SELECT * FROM users WHERE username = ?", [username], async (err, results) => {
+    if (err) return res.status(500).send(err);
+    if (results.length === 0) return res.status(401).send("User not found");
+
+    const user = results[0];
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) return res.status(401).send("Incorrect password");
+
+    const token = jwt.sign({ id: user.id, role: user.role }, "your_secret_key", { expiresIn: "1d" });
+    res.json({ token, role: user.role });
+  });
+});

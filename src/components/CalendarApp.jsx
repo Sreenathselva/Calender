@@ -75,25 +75,39 @@ const CalendarApp = () => {
   }
 
 // Fetch events when month/year changes
+const fetchEvents = async () => {
+  try {
+    const res = await axios.get(`http://localhost:5000/events`, {
+      params: {
+        month: currentMonth,
+        year: currentYear
+      }
+    });
+    setEvents(res.data);
+  } catch (err) {
+    console.error("Failed to fetch events", err);
+  }
+};
+
 useEffect(() => {
-  const fetchEvents = async () => {
-    try {
-      const res = await axios.get(`http://localhost:5000/events`, {
-        params: {
-          month: currentMonth,
-          year: currentYear
-        }
-      });
-      setEvents(res.data);
-    } catch (err) {
-      console.error("Failed to fetch events", err);
-    }
-  };
+  // const fetchEvents = async () => {
+  //   try {
+  //     const res = await axios.get(`http://localhost:5000/events`, {
+  //       params: {
+  //         month: currentMonth,
+  //         year: currentYear
+  //       }
+  //     });
+  //     setEvents(res.data);
+  //   } catch (err) {
+  //     console.error("Failed to fetch events", err);
+  //   }
+  // };
 
   fetchEvents();
 }, [currentMonth, currentYear]);
 
-  const handleEventSubmit = async () => {
+const handleEventSubmit = async () => {
   const newEvent = {
     date: selectedDate,
     time: `${eventTime.hours.padStart(2, '0')}:${eventTime.minutes.padStart(2, '0')}`,
@@ -103,12 +117,12 @@ useEffect(() => {
 
   try {
     if (editingEvent) {
-      const res = await axios.put(`http://localhost:5000/events/${editingEvent._id}`, newEvent);
-      setEvents(events.map(event => event._id === res.data._id ? res.data : event));
+      await axios.put(`http://localhost:5000/events/${editingEvent.id}`, newEvent);
     } else {
-      const res = await axios.post("http://localhost:5000/events", newEvent);
-      setEvents([...events, res.data]);
+      await axios.post("http://localhost:5000/events", newEvent);
     }
+
+    fetchEvents(); // ⬅️ Always refresh after mutation
 
     setShowEventPopup(false);
     setEditingEvent(null);
@@ -140,7 +154,7 @@ useEffect(() => {
 const handleDeleteEvent = async (eventId) => {
   try {
     await axios.delete(`http://localhost:5000/events/${eventId}`);
-    setEvents(events.filter((event) => event._id !== eventId));
+    fetchEvents(); // reload the fresh list from backend
   } catch (err) {
     console.error("Failed to delete event:", err);
   }
@@ -265,8 +279,8 @@ const handleDeleteEvent = async (eventId) => {
             <div className="event-text">{event.text}</div>
             <div className="event-buttons">
               <FontAwesomeIcon className="edit-icon" onClick={() => handleEditEvent(event)} icon={faPenToSquare} />
-              <FontAwesomeIcon className="edit-icon" icon={faTrash} key={event._id}
-              onClick={() => handleDeleteEvent(event._id)} />
+              <FontAwesomeIcon className="edit-icon" icon={faTrash} key={event.id}
+              onClick={() => handleDeleteEvent(event.id)} />
             </div>
           </div>
         ))}
