@@ -27,10 +27,12 @@ const handleLogin = async (formData) => {
 
 
 const App = () => {
+  const user = JSON.parse(localStorage.getItem("user"));
   return (
     <div className="container">
       <ErrorBoundary>
         <Router>
+          {user && <Navbar />}
           <Routes>
             <Route path="/" element={<Navigate to="/login" />} />
             <Route

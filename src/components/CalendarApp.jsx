@@ -111,10 +111,11 @@ useEffect(() => {
 
   fetchEvents();
 }, [currentMonth, currentYear]);
-
+const pad = (n) => String(n).padStart(2, '0');
+const formattedLocalDate = `${selectedDate.getFullYear()}-${pad(selectedDate.getMonth() + 1)}-${pad(selectedDate.getDate())}`;
 const handleEventSubmit = async () => {
   const newEvent = {
-    date: selectedDate,
+    date: formattedLocalDate,
     time: `${eventTime.hours.padStart(2, '0')}:${eventTime.minutes.padStart(2, '0')}`,
     text: eventText,
     type: eventType,
@@ -127,7 +128,7 @@ const handleEventSubmit = async () => {
       await axios.post("http://localhost:5000/events", newEvent);
     }
 
-    fetchEvents(); // ⬅️ Always refresh after mutation
+    fetchEvents();
 
     setShowEventPopup(false);
     setEditingEvent(null);
@@ -140,21 +141,21 @@ const handleEventSubmit = async () => {
 };
 
 
-  const handleEditEvent = (event) => {
-    if (!event || !event.time || !event.date) {
-      console.error("Invalid event object:", event);
-      return;
-    }
+    const handleEditEvent = (event) => {
+      if (!event || !event.time || !event.date) {
+        console.error("Invalid event object:", event);
+        return;
+      }
 
-    setSelectedDate(new Date(event.date));
-    setEventTime({
-      hours: event.time.split(":")[0],
-      minutes: event.time.split(":")[1],
-    });
-    setEventText(event.text || "");
-    setEditingEvent(event);
-    setShowEventPopup(true);
-  };
+      setSelectedDate(new Date(event.date));
+      setEventTime({
+        hours: event.time.split(":")[0],
+        minutes: event.time.split(":")[1],
+      });
+      setEventText(event.text || "");
+      setEditingEvent(event);
+      setShowEventPopup(true);
+    };
 
 const handleDeleteEvent = async (eventId) => {
   try {
@@ -164,7 +165,6 @@ const handleDeleteEvent = async (eventId) => {
     console.error("Failed to delete event:", err);
   }
 };
-
 
   return (
     <div className="calendar-app">
@@ -178,6 +178,7 @@ const handleDeleteEvent = async (eventId) => {
             <span onClick={nextMonth}>&gt;</span>
           </div>
         </div>
+        <div className="calender-cont">
         <div className="weekdays">
           {daysOfWeek.map((day) => <span key={day}>{day}</span>)}
         </div>
@@ -186,7 +187,7 @@ const handleDeleteEvent = async (eventId) => {
             <span key={`empty-${index}`} />
           ))}
           {[...Array(daysInMonth).keys()].map((day) => {
-            const thisDate = new Date(currentYear, currentMonth, day + 1);
+            const thisDate = new Date(currentYear, currentMonth, day+1);
 
             // Check if there’s an event on this date
             const eventOnThisDate = events.find(
@@ -210,6 +211,7 @@ const handleDeleteEvent = async (eventId) => {
               </span>
             );
           })}
+        </div>
         </div>
       </div>
       <div className="events">
@@ -273,15 +275,16 @@ const handleDeleteEvent = async (eventId) => {
                   const dateObj = event.date instanceof Date
                     ? event.date
                     : new Date(event.date);
-                
                   return !isNaN(dateObj)
-                    ? `${monthOfYear[dateObj.getMonth()]} ${dateObj.getDate()}, ${dateObj.getFullYear()}`
+                    ? `${monthOfYear[dateObj.getMonth()]} ${dateObj.getDate()} `
                     : "Invalid Date";
                 })()}
               </div>
-              <div className="event-time">{event.time}</div>
+              {event.time && event.time.trim() !== "00:00" && (
+                <div className="event-time">{event.time}</div>
+              )}
             </div>
-            <div className="event-text">{event.text}</div>
+            <div className="event-text">{event.text}{event.type === "birthday" && "🎉"}</div>
             <div className="event-buttons">
                {isAdmin && (
                   <>
