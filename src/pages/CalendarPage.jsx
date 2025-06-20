@@ -3,6 +3,7 @@ import React from "react";
 import { Navigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import CalendarApp from "../components/CalendarApp";
+import DashboardSidebar from "../components/DashboardSidebar";
 
 const CalendarPage = () => {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -16,6 +17,7 @@ const handleLogout = () => {
   return(
     <>
         <Navbar onLogout={handleLogout} />
+        <DashboardSidebar/>
         <CalendarApp role={user.role} />
     </>
   )

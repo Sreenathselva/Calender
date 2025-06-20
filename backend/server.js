@@ -99,9 +99,11 @@ app.post("/register", async (req, res) => {
     const username = email;
     const role = "user"; // Set default role manually
 
+    const approved = false;
+
     db.query(
-      "INSERT INTO users (username, password, role) VALUES (?, ?, ?)",
-      [username, hashedPassword, role],
+      "INSERT INTO users (username, password, role, approved) VALUES (?, ?, ?, ?)",
+      [username, hashedPassword, role, approved],
       (err, result) => {
         if (err) {
           console.error("MySQL INSERT Error:", err.sqlMessage || err);
@@ -145,14 +147,33 @@ app.post("/login", (req, res) => {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
+    console.log("Raw user from DB:", user);
+    
     // Send back only safe user data
     const responseUser = {
       username: user.username,
       role: user.role,
+        approved: Boolean(user.approved),
     };
 
     res.json(responseUser); // frontend expects this
 
     console.log("Returned from server:", responseUser); // ✅ Correct debug log
+  });
+});
+
+app.get("/pending-users", (req, res) => {
+  db.query("SELECT id, username FROM users WHERE approved = FALSE", (err, results) => {
+    if (err) return res.status(500).json({ message: "Database error" });
+    res.json(results);
+  });
+});
+
+
+app.put("/approve-user/:id", (req, res) => {
+  const { id } = req.params;
+  db.query("UPDATE users SET approved = TRUE WHERE id = ?", [id], (err) => {
+    if (err) return res.status(500).json({ message: "Database error" });
+    res.json({ message: "User approved" });
   });
 });

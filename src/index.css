@@ -18,9 +18,19 @@ html{
     height: 100vh;
     display: flex;
     align-items: center;
-    justify-content: center;
-    background-color: #232229;
+    justify-content: end;
+    background-color: #13323d;
 }
 .tce-logo{
     width: 5vw;
+}
+.nav-active{
+    background-color: #13323d;
+    color: aqua;
+    box-shadow: #232229 0px 3px 4px -1px;
+}
+.dash-list span{
+    width: 2vw;
+    height: 2vw;
+    border-radius: 50%;
 }

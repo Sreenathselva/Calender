@@ -8,6 +8,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import Register from "./pages/Register";
 import PrivateRoute from "./components/privateRoute";
 import RegisterPage from "./components/RegisterPage";
+import DashboardSidebar from "./components/DashboardSidebar";
 import axios from "axios"; // install if not yet: npm install axios
 
 const handleLogin = async (formData) => {
@@ -45,6 +46,14 @@ const App = () => {
                 )
               }
             />
+            <Route
+  path="/dashboard"
+  element={
+    <PrivateRoute>
+      <DashboardSidebar />
+    </PrivateRoute>
+  }
+/>
             <Route path="/register" element={<Register />} />
 
             <Route

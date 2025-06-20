@@ -14,15 +14,22 @@ const Login = () => {
       });
 
       const result = await res.json();
-      console.log("Login response:", result); // debug
+      console.log("Login response:", result);
 
       if (res.ok) {
-        alert("Login successful!");
+        // Check if user is approved
+         console.log("✅ Login result:", result); // 👈 Add this
+        if (!result.approved) {
+          alert("Your account is pending admin approval.");
+          return;
+        }
+
+        // alert("Login successful!");
 
         // ✅ Store user info safely before navigating
-        localStorage.setItem("user", JSON.stringify(result)); // assuming result = { username, role }
+        localStorage.setItem("user", JSON.stringify(result));
 
-        navigate("/calendar"); // ✅ Redirect
+        navigate("/calendar");
       } else {
         alert("Login failed: " + result.message);
       }
@@ -35,4 +42,4 @@ const Login = () => {
   return <LoginPage onSubmit={handleLogin} />;
 };
 
-export default Login;
+export default Login; 
