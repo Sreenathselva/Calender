@@ -8,7 +8,7 @@ import DashboardSidebar from "../components/DashboardSidebar";
 const CalendarPage = () => {
   const user = JSON.parse(localStorage.getItem("user"));
 const handleLogout = () => {
-    localStorage.clear();
+    // localStorage.clear();
     window.location.href = "/login";
   };
   if (!user) {

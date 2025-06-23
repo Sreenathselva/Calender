@@ -6,7 +6,10 @@ const app = express();
 const PORT = 5000;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true
+}));
 app.use(express.json());
 
 // MySQL connection
@@ -28,8 +31,14 @@ db.connect((err) => {
 // Get events by month/year
 app.get("/events", (req, res) => {
   const { month, year } = req.query;
-  const start = `${year}-${Number(month) + 1}-01`;
-  const end = `${year}-${Number(month) + 2}-01`;
+
+  const startMonth = Number(month) + 1; // month is 0-based from frontend
+  const start = `${year}-${String(startMonth).padStart(2, "0")}-01`;
+
+  // If December, go to next year's January
+  const endYear = startMonth === 12 ? Number(year) + 1 : year;
+  const endMonth = startMonth === 12 ? 1 : startMonth + 1;
+  const end = `${endYear}-${String(endMonth).padStart(2, "0")}-01`;
 
   db.query(
     "SELECT * FROM events WHERE date >= ? AND date < ? ORDER BY date ASC",
@@ -162,6 +171,8 @@ app.post("/login", (req, res) => {
   });
 });
 
+
+// approve peding users
 app.get("/pending-users", (req, res) => {
   db.query("SELECT id, username FROM users WHERE approved = FALSE", (err, results) => {
     if (err) return res.status(500).json({ message: "Database error" });
@@ -175,5 +186,32 @@ app.put("/approve-user/:id", (req, res) => {
   db.query("UPDATE users SET approved = TRUE WHERE id = ?", [id], (err) => {
     if (err) return res.status(500).json({ message: "Database error" });
     res.json({ message: "User approved" });
+  });
+});
+
+//USERS
+// Get all users
+app.get("/users", (req, res) => {
+  db.query("SELECT id, username, role, approved FROM users", (err, results) => {
+    if (err) return res.status(500).json({ message: "Database error" });
+    res.json(results);
+  });
+});
+
+// Update access
+app.put("/users/:id/access", (req, res) => {
+  const { id } = req.params;
+  const { access } = req.body;
+  db.query("UPDATE users SET access = ? WHERE id = ?", [access, id], (err) => {
+    if (err) return res.status(500).json({ message: "Database error" });
+    res.json({ message: "Access updated" });
+  });
+});
+
+// Delete user
+app.delete("/users/:id", (req, res) => {
+  db.query("DELETE FROM users WHERE id = ?", [req.params.id], (err) => {
+    if (err) return res.status(500).json({ message: "Database error" });
+    res.status(204).end();
   });
 });

@@ -9,14 +9,15 @@ import Register from "./pages/Register";
 import PrivateRoute from "./components/privateRoute";
 import RegisterPage from "./components/RegisterPage";
 import DashboardSidebar from "./components/DashboardSidebar";
-import axios from "axios"; // install if not yet: npm install axios
+import Registrations from "./components/Registrations";
+import Users from "./components/Users";
+import axios from "axios";
 
 const handleLogin = async (formData) => {
   try {
     const response = await axios.post("http://localhost:5000/api/login", formData);
     const { user, token } = response.data;
 
-    // Store user session
     localStorage.setItem("token", token);
     localStorage.setItem("user", JSON.stringify(user)); // user.role should be "admin" or "user"
     // Redirect
@@ -25,6 +26,10 @@ const handleLogin = async (formData) => {
     alert("Login failed: " + error.response?.data?.message || "Something went wrong");
   }
 };
+const handleLogout = () => {
+    localStorage.clear();
+    window.location.href = "/login";
+  };
 
 
 const App = () => {
@@ -33,7 +38,7 @@ const App = () => {
     <div className="container">
       <ErrorBoundary>
         <Router>
-          {user && <Navbar />}
+           {user && <Navbar onLogout={handleLogout}/>}
           <Routes>
             <Route path="/" element={<Navigate to="/login" />} />
             <Route
@@ -47,13 +52,13 @@ const App = () => {
               }
             />
             <Route
-  path="/dashboard"
-  element={
-    <PrivateRoute>
-      <DashboardSidebar />
-    </PrivateRoute>
-  }
-/>
+              path="/dashboard"
+              element={
+                <PrivateRoute>
+                  <DashboardSidebar />
+                </PrivateRoute>
+              }
+            />
             <Route path="/register" element={<Register />} />
 
             <Route
@@ -66,6 +71,8 @@ const App = () => {
             />
 
             <Route path="/registerPage" element={<RegisterPage />} />
+            <Route path="/registrations" element={<Registrations />} />
+            <Route path="/users" element={<Users />} />
             <Route path="/dashboard" element={<div>Dashboard Page</div>} />
           </Routes>
         </Router>
