@@ -215,3 +215,12 @@ app.delete("/users/:id", (req, res) => {
     res.status(204).end();
   });
 });
+
+
+// getting all events for Dates component
+app.get("/all-events", (req, res) => {
+  db.query("SELECT * FROM events ORDER BY date ASC", (err, results) => {
+    if (err) return res.status(500).json({ message: "Database error" });
+    res.json(results);
+  });
+});

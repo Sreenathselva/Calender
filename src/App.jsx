@@ -11,6 +11,7 @@ import RegisterPage from "./components/RegisterPage";
 import DashboardSidebar from "./components/DashboardSidebar";
 import Registrations from "./components/Registrations";
 import Users from "./components/Users";
+import Dates from "./components/Dates";
 import axios from "axios";
 
 const handleLogin = async (formData) => {
@@ -73,6 +74,7 @@ const App = () => {
             <Route path="/registerPage" element={<RegisterPage />} />
             <Route path="/registrations" element={<Registrations />} />
             <Route path="/users" element={<Users />} />
+            <Route path="/dates" element={<Dates />} />
             <Route path="/dashboard" element={<div>Dashboard Page</div>} />
           </Routes>
         </Router>

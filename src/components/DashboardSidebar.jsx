@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const DashboardSidebar = () => {
@@ -62,15 +63,7 @@ const DashboardSidebar = () => {
           >
             USERS
           </li>
-          <li
-            style={{
-              ...styles.li,
-              backgroundColor: isActive("/dates") ? "#1e293b" : "transparent",
-            }}
-            onClick={() => navigate("/dates")}
-          >
-            DATES
-          </li>
+         <li style={styles.li}><Link to="/dates" style={{ color: 'inherit', textDecoration: 'none' }}>DATES</Link></li>
         </ul>
       </div>
     </nav>
