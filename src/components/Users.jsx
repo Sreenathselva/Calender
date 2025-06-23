@@ -36,23 +36,37 @@ const Users = () => {
 
       <div style={styles.container}>
         <h2 style={styles.h2}>Users List</h2>
-        <ul>
-          {users.map((user) => (
-            <li key={user.id} style={styles.item}>
-              <div>
-                <strong>{user.username}</strong> — Role: {user.role}
-              </div>
-              <div style={styles.actions}>
-                <button onClick={() => toggleAccess(user.id, user.access)} style={styles.button}>
-                  {user.access ? "Revoke Access" : "Grant Access"}
-                </button>
-                <button onClick={() => deleteUser(user.id)} style={styles.deleteButton}>
-                  Delete
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
+      <ul>
+  {users.map((user) => (
+    <li key={user.id} style={styles.item}>
+      <div>
+        <strong>{user.username}</strong> — {user.role.toUpperCase()}
+        <p style={{ fontSize: "0.9rem" }}>
+          Status: {user.approved ? "✅ Approved" : "❌ Not Approved"}
+        </p>
+      </div>
+
+      <div style={{ display: "flex", gap: "1rem" }}>
+        {user.approved ? (
+          <button
+            style={styles.buttonRed}
+            onClick={() => updateApproval(user.id, false)}
+          >
+            Revoke Access
+          </button>
+        ) : (
+          <button
+            style={styles.button}
+            onClick={() => updateApproval(user.id, true)}
+          >
+            Grant Access
+          </button>
+        )}
+      </div>
+    </li>
+  ))}
+</ul>
+
       </div>
     </>
   );
@@ -65,6 +79,14 @@ const styles = {
     fontFamily: "montserrat",
     textTransform: "uppercase",
     color: "#fff",
+  },
+  buttonRed:{
+    padding: ".5rem",
+    borderRadius: ".5rem",
+    border: "none",
+    backgroundColor: "#E62020",
+    color: "#fff",
+    cursor: "pointer"
   },
   item: {
     margin: "1rem 0",
