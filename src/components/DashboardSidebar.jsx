@@ -1,3 +1,4 @@
+import { height, width } from "@fortawesome/free-solid-svg-icons/fa0";
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -27,43 +28,39 @@ const DashboardSidebar = () => {
     <nav style={styles.navbar}>
       <div style={styles.navCont}>
         <ul style={styles.ul}>
-          <li
-            style={{
-              ...styles.li,
-              backgroundColor: isActive("/dashboard") ? "#1e293b" : "transparent", textDecoration: "underline"
-            }}
+          <li style={styles.li}
+            className={`nav-item ${isActive("/dashboard") ? "active" : ""}`}
           >
             DASHBOARD
           </li>
-          <li
-            style={{
-              ...styles.li,
-              backgroundColor: isActive("/registrations") ? "#1e293b" : "transparent",
-            }}
+
+          <li style={styles.li}
+            className={`nav-item ${isActive("/registrations") ? "active" : ""}`}
             onClick={() => navigate("/registrations")}
           >
-            REGISTERATIONS{" "}
-            {pendingCount > 0 && <span style={{ color: "red" }}>({pendingCount})</span>}
+            REGISTRATIONS {pendingCount > 0 && <div style={styles.span}>{pendingCount}</div>}
           </li>
-          <li
-            style={{
-              ...styles.li,
-              backgroundColor: isActive("/calendar") ? "#1e293b" : "transparent",
-            }}
+
+          <li style={styles.li}
+            className={`nav-item ${isActive("/calendar") ? "active" : ""}`}
             onClick={() => navigate("/calendar")}
           >
             CALENDAR
           </li>
-          <li
-            style={{
-              ...styles.li,
-              backgroundColor: isActive("/users") ? "#1e293b" : "transparent",
-            }}
+
+          <li style={styles.li}
+            className={`nav-item ${isActive("/users") ? "active" : ""}`}
             onClick={() => navigate("/users")}
           >
             USERS
           </li>
-         <li style={styles.li}><Link to="/dates" style={{ color: 'inherit', textDecoration: 'none' }}>DATES</Link></li>
+
+         <li style={styles.li}
+            className={`nav-item ${isActive("/dates") ? "active" : ""}`}
+            onClick={() => navigate("/dates")}
+          >
+            DATES
+          </li>
         </ul>
       </div>
     </nav>
@@ -74,7 +71,7 @@ const styles = {
   navbar: {
     position: "fixed",
     left: "0",
-    width: "25%",
+    width: "20%",
     height: "100%",
     color: "#fff",
     display: "flex",
@@ -102,16 +99,30 @@ const styles = {
     gap: "3rem",
   },
   li: {
-    padding: "2rem 1rem",
+    padding: "2rem 3rem",
     listStyleType: "none",
     fontFamily: "Montserrat, sans-serif",
     fontSize: "1.7rem",
+    display: "flex",
+    gap: "1rem",
     fontWeight: "600",
     letterSpacing: "1px",
     borderRadius: "6vw 0vw 0vw 6vw",
     cursor: "pointer",
-    transition: "all 0.3s",
+    textShadow:"1px 1px 1px #000000",
+    transition: "all 0.3s ease",
   },
+  span: {
+    width: "1vw",
+    height: "1vw",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    textAlign: "center",
+    backgroundColor: "red",
+    borderRadius: "5vw",
+    fontSize: ".8vw"
+  }
 };
 
 export default DashboardSidebar;

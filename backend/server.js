@@ -201,10 +201,14 @@ app.get("/users", (req, res) => {
 // Update access
 app.put("/users/:id/access", (req, res) => {
   const { id } = req.params;
-  const { access } = req.body;
-  db.query("UPDATE users SET access = ? WHERE id = ?", [access, id], (err) => {
+  const { approved } = req.body;
+
+  // If approved is false, change it to 2 (revoked), else 1 (approved)
+  const updatedValue = approved ? 1 : 2;
+
+  db.query("UPDATE users SET approved = ? WHERE id = ?", [updatedValue, id], (err) => {
     if (err) return res.status(500).json({ message: "Database error" });
-    res.json({ message: "Access updated" });
+    res.json({ message: "User approval status updated" });
   });
 });
 

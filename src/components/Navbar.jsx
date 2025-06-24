@@ -33,7 +33,7 @@ const styles = {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: "0 2.5rem",
+    padding: "0",
     zIndex:"99",
     boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
   },
@@ -41,6 +41,7 @@ const styles = {
     fontSize: "1.5rem",
     fontWeight: "bold",
     fontFamily: "Montserrat, sans-serif",
+    marginLeft: "5rem"
   },
   logoutButton: {
     background: "#fff",
@@ -48,6 +49,7 @@ const styles = {
     border: "none",
     padding: "8px 16px",
     borderRadius: "6px",
+    marginRight: "4rem",
     fontWeight: 600,
     cursor: "pointer",
     transition: "background 0.3s ease",

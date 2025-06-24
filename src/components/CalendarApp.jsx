@@ -168,7 +168,7 @@ const handleDeleteEvent = async (eventId) => {
 };
 
   return (
-    <div className="calendar-app">
+    <div className="calendar-app fade-page">
       <div className="calendar">
         <h1 className="heading">Traicon Calendar</h1>
         <div className="navigate-date">

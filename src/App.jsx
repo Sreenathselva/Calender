@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./components/CalendarApp.css";
 import CalendarPage from "./pages/CalendarPage";
 import Navbar from "./components/Navbar";
+import { AnimatePresence } from "framer-motion";
 import Login from "./pages/Login";
 import { Navigate } from "react-router-dom";
 import ErrorBoundary from './components/ErrorBoundary';
@@ -27,10 +28,11 @@ const handleLogin = async (formData) => {
     alert("Login failed: " + error.response?.data?.message || "Something went wrong");
   }
 };
+
 const handleLogout = () => {
     localStorage.clear();
     window.location.href = "/login";
-  };
+};
 
 
 const App = () => {

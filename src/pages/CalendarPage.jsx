@@ -16,7 +16,7 @@ const handleLogout = () => {
   }
   return(
     <>
-        <Navbar onLogout={handleLogout} />
+        <Navbar />
         <DashboardSidebar/>
         <CalendarApp role={user.role} />
     </>

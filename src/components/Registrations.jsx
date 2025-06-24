@@ -29,10 +29,10 @@ const Registrations = () => {
       <Navbar onLogout={handleLogout} />
       <DashboardSidebar />
 
-      <div style={styles.container}>
+      <div style={styles.container} className="fade-page">
         <h2 style={styles.h2}>Pending Registration Requests</h2>
         {pendingUsers.length === 0 ? (
-          <p>No pending users.</p>
+          <p style={styles.p}>No pending users.</p>
         ) : (
           <ul>
             {pendingUsers.map((user) => (
@@ -55,6 +55,11 @@ const styles = {
     fontFamily: "montserrat",
     textTransform: "uppercase",
     color: "#fff"
+  },
+  p:{
+    fontSize:"1.4rem",
+    padding: "2rem",
+    color: "white"
   },
   item: { 
     margin: "1rem 0",

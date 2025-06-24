@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import DashboardSidebar from "./DashboardSidebar";
 import Navbar from "./Navbar";
+import { width } from "@fortawesome/free-solid-svg-icons/fa0";
 
 const Users = () => {
   const [users, setUsers] = useState([]);
@@ -11,19 +12,22 @@ const Users = () => {
     setUsers(data);
   };
 
-  const toggleAccess = async (id, currentAccess) => {
+  const updateApproval = async (id, newStatus) => {
     await fetch(`http://localhost:5000/users/${id}/access`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ access: !currentAccess }),
+      body: JSON.stringify({ approved: newStatus }),
     });
-    fetchUsers(); // refresh list
+    fetchUsers();
   };
 
   const deleteUser = async (id) => {
-    await fetch(`http://localhost:5000/users/${id}`, { method: "DELETE" });
-    fetchUsers();
+    if (window.confirm("Are you sure you want to delete this user?")) {
+      await fetch(`http://localhost:5000/users/${id}`, { method: "DELETE" });
+      fetchUsers();
+    }
   };
+
 
   useEffect(() => {
     fetchUsers();
@@ -34,38 +38,51 @@ const Users = () => {
       <Navbar />
       <DashboardSidebar />
 
-      <div style={styles.container}>
+      <div style={styles.container} className="fade-page">
         <h2 style={styles.h2}>Users List</h2>
-      <ul>
-  {users.map((user) => (
-    <li key={user.id} style={styles.item}>
-      <div>
-        <strong>{user.username}</strong> — {user.role.toUpperCase()}
-        <p style={{ fontSize: "0.9rem" }}>
-          Status: {user.approved ? "✅ Approved" : "❌ Not Approved"}
-        </p>
-      </div>
+        <ul>
+          {users.map((user) => (
+            <li key={user.id} style={styles.item}>
+              <div style={styles.userName}>
+                <strong>{user.username}</strong> — {user.role.toUpperCase()}
 
-      <div style={{ display: "flex", gap: "1rem" }}>
-        {user.approved ? (
-          <button
-            style={styles.buttonRed}
-            onClick={() => updateApproval(user.id, false)}
-          >
-            Revoke Access
-          </button>
-        ) : (
-          <button
-            style={styles.button}
-            onClick={() => updateApproval(user.id, true)}
-          >
-            Grant Access
-          </button>
-        )}
-      </div>
-    </li>
-  ))}
-</ul>
+              </div>
+              <p style={{ fontSize: "1.2rem", marginTop: ".5rem" }}>
+                Status:{" "}
+                {user.approved === 1
+                  ? "✅ Approved"
+                  : user.approved === 2
+                    ? "🚫 Revoked"
+                    : "❌ Not Approved"}
+              </p>
+
+              <div style={{ display: "flex", gap: "1rem" }}>
+                {user.approved === 1 ? (
+                  <button
+                    style={styles.buttonRed}
+                    onClick={() => updateApproval(user.id, 2)} // Revoke -> set to 2
+                  >
+                    Revoke Access
+                  </button>
+                ) : (
+                  <button
+                    style={styles.button}
+                    onClick={() => updateApproval(user.id, 1)} // Grant -> set to 1
+                  >
+                    Grant Access
+                  </button>
+                )}
+
+                <button
+                  style={styles.deleteButton}
+                  onClick={() => deleteUser(user.id)}
+                >
+                  Delete User
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
 
       </div>
     </>
@@ -73,18 +90,18 @@ const Users = () => {
 };
 
 const styles = {
-  container: { padding: "2rem", width: "75%", height: '75%', fontFamily: "Montserrat" },
+  container: { padding: "2rem 4rem 0 0", width: "75%", height: '75%', fontFamily: "Montserrat" },
   h2: {
     fontSize: "1.5vw",
     fontFamily: "montserrat",
     textTransform: "uppercase",
     color: "#fff",
   },
-  buttonRed:{
+  buttonRed: {
     padding: ".5rem",
     borderRadius: ".5rem",
     border: "none",
-    backgroundColor: "#E62020",
+    backgroundColor: "#2563eb",
     color: "#fff",
     cursor: "pointer"
   },
@@ -100,12 +117,16 @@ const styles = {
     color: "#ffffff",
   },
   actions: { display: "flex", gap: "1rem" },
+  userName: {
+    width: "20vw"
+  },
   button: {
-    background: "#2563eb",
+    background: "green",
     color: "#fff",
     padding: "0.5rem 1rem",
     border: "none",
     borderRadius: "5px",
+    cursor: "pointer"
   },
   deleteButton: {
     background: "#dc2626",
