@@ -4,6 +4,9 @@ import { Link } from "react-router-dom";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const DashboardSidebar = () => {
+   const user = JSON.parse(localStorage.getItem("user"));
+  const isAdmin = user?.role === "admin";
+
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -28,25 +31,35 @@ const DashboardSidebar = () => {
     <nav style={styles.navbar}>
       <div style={styles.navCont}>
         <ul style={styles.ul}>
+          
           <li style={styles.li}
             className={`nav-item ${isActive("/dashboard") ? "active" : ""}`}
           >
             DASHBOARD
           </li>
-
-          <li style={styles.li}
+            <li style={styles.li}
+            className={`nav-item ${isActive("/calendar") ? "active" : ""}`}
+            onClick={() => navigate("/calendar")}
+          >
+            CALENDAR
+          </li>
+             <li style={styles.li}
+            className={`nav-item ${isActive("/dates") ? "active" : ""}`}
+            onClick={() => navigate("/dates")}
+          >
+            DATES
+          </li>
+          
+          {isAdmin &&(
+            <>
+             <li style={styles.li}
             className={`nav-item ${isActive("/registrations") ? "active" : ""}`}
             onClick={() => navigate("/registrations")}
           >
             REGISTRATIONS {pendingCount > 0 && <div style={styles.span}>{pendingCount}</div>}
           </li>
 
-          <li style={styles.li}
-            className={`nav-item ${isActive("/calendar") ? "active" : ""}`}
-            onClick={() => navigate("/calendar")}
-          >
-            CALENDAR
-          </li>
+        
 
           <li style={styles.li}
             className={`nav-item ${isActive("/users") ? "active" : ""}`}
@@ -54,13 +67,11 @@ const DashboardSidebar = () => {
           >
             USERS
           </li>
+            </>
+          )}
+         
 
-         <li style={styles.li}
-            className={`nav-item ${isActive("/dates") ? "active" : ""}`}
-            onClick={() => navigate("/dates")}
-          >
-            DATES
-          </li>
+      
         </ul>
       </div>
     </nav>

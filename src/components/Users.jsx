@@ -90,7 +90,7 @@ const Users = () => {
 };
 
 const styles = {
-  container: { padding: "2rem 4rem 0 0", width: "75%", height: '75%', fontFamily: "Montserrat" },
+  container: { padding: "2rem 4rem 0 0", width: "75%", height: '75%', fontFamily: "Montserrat", overflowY: "scroll"},
   h2: {
     fontSize: "1.5vw",
     fontFamily: "montserrat",
